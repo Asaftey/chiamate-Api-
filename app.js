@@ -1,42 +1,42 @@
-/* Creare un bottone che al click esegua una chiamata HTTP verso l'endpoint
-https://v2.jokeapi.dev/joke/Programming.
-Utilizzando async e await:
-Stampare nella console il risultato della chiamata di rete
-Stampare in un H3 la proprietà setup
-Stampare in un paragrafo la proprietà delivery
-Se una delle due proprietà non esiste all'interno della risposta far comparire
-un'alert con il testo "Proprietà non esistente!"
-Al click del bottone deve essere effettuata una nuova chiamata di rete e il DOM deve
-agg
- deve
-aggiornarsi con i nuovi dati. */
-const body = document.querySelector('body');
+
+/** Scrivere uno script che recupera i tags dall'api, di questi ne prende dal quinto al decimo e dal quindicesimo al ventesimo 
+  *  creare un menù dropdown con i 10 tag recuperati e alla selezione di un elemento del menù  
+  *  effettua una chiamata all'api (  https://cataas.com/#/  )recuperando un elemento con il tag selezionato 
+  *  di questo elemento, bisogna mostrare nella pagina html la foto del gatto e i tags di quell'elemento 
+  *  formattati in questo modo "tag1 - tag2 - tag3"*/
 
 
-const btn = document.querySelector('button')
 
-
-const funzioneAsync = async () =>{
-    const response =  await fetch('https://v2.jokeapi.dev/joke/Programming')
+const recuperaApi = async () =>{
+    const response = await fetch ('https://cataas.com/api/tags')
     const data = await response.json();
+    
 
-    console.log(data)
+    const catsArray = data.slice(5, 10);
+    const catsArray2 = data.slice(15, 20);
+    const cats = catsArray.concat(catsArray2);
+    const select = document.getElementById('cats');
 
-    if(!data.setup || !data.delivery){
-        alert("Propieta non esiste")
+    cats.forEach(element => {
+       const option = document.createElement('option');
+       select.appendChild(option)
+       option.textContent = element
+    });
+
+    const recuperaImgCats = async()=>{
+        select.addEventListener('change', async()=>{
+            const casualCats = await fetch(`https://cataas.com/cat/${select.value}?json=true`)
+            const finalCats = await casualCats.json();
+
+            const img = document.createElement('img');
+            document.body.appendChild(img);
+            img.src = `https://cataas.com${finalCats.url}`
+
+            const tags = document.createElement('h2')
+            document.body.appendChild(tags)
+            tags.textContent = finalCats.tags.join('-')
+        })
     }
-
-    const h3 = document.createElement('h3');
-    h3.textContent = `${data.setup}` 
-    body.appendChild(h3)
-
-    console.log(h3)
-
-    const p = document.createElement('p');
-    p.textContent = `${data.delivery}` 
-    body.appendChild(p)
-    console.log(p)
-
-};
-btn.addEventListener("click", funzioneAsync);
-
+    recuperaImgCats()
+}
+recuperaApi()
